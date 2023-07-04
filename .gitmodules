@@ -1,0 +1,3 @@
+[submodule "POSIXStorage"]
+	path = POSIXStorage
+	url = https://github.com/alrvid/POSIXStorage
