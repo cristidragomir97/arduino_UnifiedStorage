@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ $1 == "upload" ]]; then
+    arduino-cli lib install "Arduino_USBHostMbed5"
+    arduino-cli compile -b arduino:mbed_portenta:envie_m7 --library "/home/c.dragomir/ArduinoWorkspace/UnifiedStorageAPI/POSIXStorage"
+    arduino-cli upload -b arduino:mbed_portenta:envie_m7
+else
+    # Execute the two lines
+    arduino-cli lib install "Arduino_USBHostMbed5"
+    arduino-cli compile -b arduino:mbed_portenta:envie_m7 --library "/home/c.dragomir/ArduinoWorkspace/UnifiedStorageAPI/POSIXStorage"
+fi
