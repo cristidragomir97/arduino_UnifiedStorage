@@ -1,6 +1,6 @@
 #include "SDStorage.h"
 
-SDStorage:SDStorage(){
+SDStorage::SDStorage(){
 
 }
 

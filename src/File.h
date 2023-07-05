@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "Directory.h"
 
 class File : public Stream {
 public:
@@ -85,14 +86,17 @@ public:
   * @brief Copies the file to the specified destination path.
   * @param destinationPath The destination path to copy the file to.
   */
-  void copyTo(const char * destinationPath);
+  bool copyTo(const char* destinationPath);
 
   /**
   * @brief Moves the file to the specified destination path.
   * @param destinationPath The destination path to move the file to.
   */
-  void moveTo(const char * destinationPath);
+  bool moveTo(const char * destinationPath);
 
+  Directory getParentFolder();
+
+  // copy to directory object 
 
   // Inherited methods from Stream
   int available() override;

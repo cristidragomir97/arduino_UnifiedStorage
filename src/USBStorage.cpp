@@ -1,10 +1,10 @@
 #include "USBStorage.h"
 
-USBStorage:USBStorage(){
+USBStorage::USBStorage(){
 
 }
 
-int SDStorage::begin(){
+int USBStorage::begin(){
     int err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
     while (0 != err) {
         int err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);

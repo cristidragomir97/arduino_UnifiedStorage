@@ -12,7 +12,7 @@
     #include "FATFileSystem.h"
 #endif 
 
-class InternalStorage: {
+class InternalStorage {
     public:
         InternalStorage();
         // Override begin() method for SD card initialization

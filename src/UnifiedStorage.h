@@ -1,6 +1,3 @@
-#ifndef UNIFIED_STORAGE_H
-#define UNIFIED_STORAGE_H
-
 #include "Arduino.h"
 #include "USBStorage.h"
 #include "SDStorage.h"

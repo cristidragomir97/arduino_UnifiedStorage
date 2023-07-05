@@ -1,44 +1,21 @@
 #include "Directory.h"
+#include "unistd.h"
+
+Directory::Directory(){
+
+}
 
 Directory::Directory(const char * dirname){
     // Create the directory
-    int result = mkdir(dirname, S_IRWXU | S_IRWXG | S_IRWXO);
-    this -> dirname = (char *) dirname;
-    if (result == 0) {
-        return true;
-    } else {
-        // Error occurred while creating the directory
-        return false;
-    }
-}
+    int result = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
+    this -> path = (char *) dirname;
 
-Directory::list(){
-      // Open the directory
-    DIR* dir = opendir(this -> dirname);
-    if (dir == nullptr) {
-        // Error occurred while opening the directory
-        return;
-    }
-
-    // Read directory entries
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != nullptr) {
-        // Skip current directory (".") and parent directory ("..")
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
-
-        // Print the directory entry name
-        Serial.println(entry->d_name);
-    }
-
-    // Close the directory
-    closedir(dir);
 }
 
 bool Directory::remove(const char* dirname) {
+  
     // Remove the directory
-    int result = ::rmdir(dirname);
+    int result = rmdir(dirname);
     if (result == 0) {
         return true;
     } else {
@@ -74,7 +51,7 @@ bool Directory::exists() {
 }
 
 const char * Directory::getPath(){
-
+    return this -> path;
 }
 
 Directory Directory::createSubfolder(const char* subfolderName) {
@@ -122,7 +99,7 @@ bool Directory::renameSubfolder(const char* oldName, const char* newName) {
   strcat(newPath, newName);
 
   // Rename the subfolder
-  if (rename(oldPath, newPath) == 0) {
+  if (::rename(oldPath, newPath) == 0) {
     free(oldPath);
     free(newPath);
     return true;

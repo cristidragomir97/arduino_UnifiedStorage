@@ -1,5 +1,11 @@
+
 #include "Arduino.h"
-#include "unistd.h"
+
+#ifndef Directory_H
+#define Directory_H
+
+
+
 
 /**
  * @class Directory
@@ -7,6 +13,7 @@
  */
 class Directory {
   public:
+    Directory();
     /**
      * @brief Constructor.
      * @param dirname The name of the directory.
@@ -46,6 +53,7 @@ class Directory {
      */
     const char * getPath();
 
+    // TODO: Also support Arduino String instead along with const char * 
 
     /**
      * @brief Creates a subfolder in the directory.
@@ -89,5 +97,8 @@ class Directory {
 
   private: 
     char * dirname;
+    char * path;
     DIR * dir;
 };
+
+#endif

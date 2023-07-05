@@ -1,7 +1,8 @@
 #include "POSIXStorage.h"
 #include "Directory.h"
 
-class USBStorage: {
+
+class USBStorage {
     public:
         USBStorage();
         // Override begin() method for SD card initialization

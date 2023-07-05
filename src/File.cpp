@@ -1,5 +1,5 @@
 #include "File.h"
-#include "Directory.h"
+
 
 File::File() {
     this->fp = nullptr;
@@ -188,7 +188,7 @@ bool File::copyTo(const char* destinationPath) {
 
 bool File::moveTo(const char* destinationPath) {
   // Rename the file to the destination path
-  if (rename(this->path, destinationPath) == 0) {
+  if (::rename(this->path, destinationPath) == 0) {
     // Update the internal path
     free(this->path);
     this->path = strdup(destinationPath);
@@ -208,6 +208,7 @@ Directory File::getParentFolder() {
     return Directory(parentPath);
   } else {
     free(parentPath);
-    return Directory("/");
+    return Directory();
+  }
 }
 
