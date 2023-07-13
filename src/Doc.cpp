@@ -157,9 +157,6 @@ size_t Doc::write(String data) {
     return bytesWritten;
 }
 
-int Doc::peek(){
-
-}
 
 bool Doc::remove() {
     // Remove the file

@@ -10,33 +10,43 @@
 
 class Directory;
 
-class Doc /*: public Stream */{
-public:
-  /**
-   * @enum DocMode
-   * @brief Doc modes for opening files.
-   */
 
+
+class Doc{
+public:
 
   /**
    * @brief Constructor.
-   */
+  */
   Doc();
 
+  /**
+   * @brief Constructor.
+   * @param const char * path - path of the file
+  */
   Doc(const char* path);
 
-
+   /**
+   * @brief Closes the file, and opens it again with a new file mode
+   * @param mode The file mode (READ, WRITE, or APPEND).
+   * @return True if operation was successful, false otherwise.
+   */
   bool changeMode(FileMode mode);
 
   /**
    * @brief Opens a file with the specified mode.
-   * @param filename The name of the file to open.
+   * @param const char * filename - The name of the file to open.
    * @param mode The file mode (READ, WRITE, or APPEND).
    * @return True if the file was opened successfully, false otherwise.
-   */
+  */
   bool open(const char* filename, FileMode mode);
 
-
+  /**
+   * @brief Opens a file with the specified mode.
+   * @param String filename - The name of the file to open.
+   * @param mode The file mode (READ, WRITE, or APPEND).
+   * @return True if the file was opened successfully, false otherwise.
+  */
   bool open(String filename, FileMode mode);
 
 
@@ -61,8 +71,8 @@ public:
   size_t read(uint8_t* buffer, size_t size);
 
   /**
-   * @brief Reads the contents of the file as a string.
-   * @return The file contents as a string.
+   * @brief Reads the contents of the file as an Arduino String.
+   * @return The file contents as a String.
    */
   String readAsString();
 
@@ -89,11 +99,16 @@ public:
 
   /**
    * @brief Renames the file.
-   * @param newDocname The new name of the file.
+   * @param const char * newDocname The new name of the file.
    * @return True if the file was renamed successfully, false otherwise.
    */
   bool rename(const char* newDocname);
 
+  /**
+   * @brief Renames the file.
+   * @param String newDocname The new name of the file.
+   * @return True if the file was renamed successfully, false otherwise.
+   */
   bool rename(String newDocname);
 
   /**
@@ -104,47 +119,68 @@ public:
 
   /**
   * @brief Copies the file to the specified destination path.
-  * @param destinationPath The destination path to copy the file to.
+  * @param const char * destinationPath - The destination path to copy the file to.
+  * @return True upon success, false otherwise. 
   */
   bool copyTo(const char* destinationPath);
 
+  /**
+  * @brief Copies the file to the specified destination path.
+  * @param String destinationPath The destination path to copy the file to.
+  * @return True upon success, false otherwise. 
+  */
   bool copyTo(String destinationPath);
 
-
- /**
-  * @brief Copies the file to the specified destination folder.
-  * @param destinationFolder The destination directory to copy the file to.
+  /**
+  * @brief Copies the file to the specified destination path.
+  * @param Directory destinationPath - The destination folder to copy the file to.
+  * @return True upon success, false otherwise. 
   */
   bool copyTo(Directory * destinationFolder);
 
   /**
   * @brief Moves the file to the specified destination path.
-  * @param destinationPath The destination path to move the file to.
+  * @param const char * destinationPath The destination path to move the file to.
+  * @return True upon success, false otherwise. 
   */
   bool moveTo(const char * destinationPath);
 
+  /**
+  * @brief Moves the file to the specified destination path.
+  * @param String destinationPath The destination path to move the file to.
+  * @return True upon success, false otherwise. 
+  */
   bool moveTo(String destinationPath);
 
   /**
   * @brief Copies the file to the specified destination folder.
-  * @param destinationFolder The destination directory to copy the file to.
+  * @param Directory destinationFolder The destination directory to move the file to.
+  * @return True upon success, false otherwise. 
   */
   bool moveTo(Directory * destinationFolder);
 
-  //Directory getParentFolder();
+  /*
+     * @brief Returns a reference to the parent folder of the current folder. 
+     * @return A directory object representing the current folder. 
+  */
   Directory getParentFolder();
 
-  // copy to directory object 
+  /*
+     * @brief Returns the path of the directory.
+     * @return The path of the file as a const char * 
+  */
   const char * getPath();
 
+  /*
+     * @brief Returns the path of the directory.
+     * @return The path of the file as a String
+  */
   String getPathString();
 
   // Inherited methods from Stream
   int available() ;
   int read() ;
-  int peek() ;
-  size_t write(uint8_t value) ;
-//  using Print::write;  // Bring the other write methods from Print into Doc
+  size_t write(uint8_t value);
 
 
 private:

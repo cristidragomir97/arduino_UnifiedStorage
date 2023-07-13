@@ -1,7 +1,3 @@
-
-
-
-
 #ifndef Directory_H
 #define Directory_H
 
@@ -10,14 +6,6 @@
 
 class Doc;
 
-
-namespace UniStdWrapper {
-  #include <unistd.h>
-}
-
-
-
-
 /**
  * @class Directory
  * @brief Class representing a directory.
@@ -25,97 +13,142 @@ namespace UniStdWrapper {
 class Directory {
 
   public:
-    /**
+    /*
      * @brief Blank Constructor.
      */
     Directory();
-    /**
+
+    /*
      * @brief Constructor.
-     * @param const char * dirname The name of the directory.
+     * @param const char * dirname - The name of the directory.
      */
     Directory(const char * dirname);
 
-
-      /**
+    /*
      * @brief Constructor.
-     * @param string dirname The name of the directory.
+     * @param String dirname - The name of the directory.
      */
     Directory(String dirname);
 
-    /**
-     * @brief Creates a directory.
-     * @param dirname The name of the directory to create.
-     * @return True if the directory was created successfully, false otherwise.
+    /*
+     * @brief Creates a file inside the directory.
+     * @param const char * fileName - The name of the file to create.
+     * @return A File object if successfull, NULL if not. 
      */
-
     Doc createFile(const char * fileName, FileMode fmode);
 
+   /*
+     * @brief Creates a file inside the directory.
+     * @param String fileName - The name of the file to create.
+     * @return A File object if successfull, NULL if not. 
+     */
     Doc createFile(String fileName, FileMode fmode);
 
-    /**
+    /*
      * @brief Removes a directory.
      * @param dirname The name of the directory to remove.
      * @return True if the directory was removed successfully, false otherwise.
      */
     bool remove();
 
-    /**
+    /*
      * @brief Renames a directory.
-     * @param newDirname The new name of the directory.
+     * @param const char * newDirname The new name of the directory.
      * @return True if the directory was renamed successfully, false otherwise.
      */
     bool rename(const char * newDirname);
 
+    /*
+     * @brief Renames a directory.
+     * @param String newDirname The new name of the directory.
+     * @return True if the directory was renamed successfully, false otherwise.
+     */
     bool rename(String newDirname);
 
-    /**
+    /*
      * @brief Checks if the directory exists.
      * @return True if the directory exists, false otherwise.
      */
     bool exists();
 
-    /**
+    /*
      * @brief Returns the path of the file.
-     * @return The path of the file.
+     * @return The path of the file as a const char * 
      */
     const char * getPath();
 
+    /*
+     * @brief Returns the path of the file.
+     * @return The path of the file as an Arduino String
+    */
     String getPathString();
 
-    // TODO: Also support Arduino String instead along with const char * 
-
-    /**
+    /*
      * @brief Creates a subfolder in the directory.
-     * @param subfolderName The name of the subfolder to create.
+     * @param const char * subfolderName - he name of the subfolder to create.
      * @return The created subfolder.
-     */
+    */
     Directory createSubfolder(const char * subfolderName);
 
-
+    /*
+     * @brief Creates a subfolder in the directory.
+     * @param String subfolderName - he name of the subfolder to create.
+     * @return The created subfolder.
+     */
     Directory createSubfolder(String subfolderName);
 
-    /**
-     * @brief Removes a subfolder from the directory.
-     * @param subfolderName The name of the subfolder to remove.
-     * @return True if the subfolder was removed successfully, false otherwise.
+    /*
+     * @brief Returns File objects for all files in the current dirctory.
+     * @return A std::vector of File objects representing the files in the directory.
      */
     std::vector<Doc> getFiles();
 
-    /**
-     * @brief Lists all subfolders in the directory.
+   /*
+     * @brief Returns Directory objects for all files in the current dirctory.
+     * @return A std::vector of Directory objects representing the files in the directory.
      */
     std::vector<Directory>  getFolders();
 
+    /*
+     * @brief Copies the current directory
+     * @param Directory destination - a Directory object representing the destination
+     * @return True upon success, false otherwise. 
+     */
     bool copyTo(Directory destination);
 
+    /*
+     * @brief Copies the current directory
+     * @param const char * destination - the path of the destination location
+     * @return True upon success, false otherwise. 
+     */
     bool copyTo(const char * destination);
 
+    /*
+     * @brief Copies the current directory
+     * @param String destination - the path of the destination location
+     * @return True upon success, false otherwise. 
+     */
     bool copyTo(String destination);
 
+    /*
+     * @brief Moves the current directory
+     * @param Directory destination - a Directory object representing the destination
+     * @return True upon success, false otherwise. 
+     */
     bool moveTo(Directory destination);
 
+    /*
+     * @brief Moves the current directory
+     * @param const char * destination - the path of the destination location
+     * @return True upon success, false otherwise. 
+    */
     bool moveTo(const char * destination);
 
+    /*
+     * @brief Move the current directory
+     * @param String destination - the path of the destination location
+     * @return True upon success, false otherwise. 
+     */
     bool moveTo(String destination);
 
   private: 
