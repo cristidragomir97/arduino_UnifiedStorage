@@ -1,4 +1,4 @@
-#include "InternalStorage.h"
+#include "UnifiedStorage.h"
 
 InternalStorage::InternalStorage(){
 
@@ -6,14 +6,15 @@ InternalStorage::InternalStorage(){
 
 int InternalStorage::begin(){
    #if defined(ARDUINO_PORTENTA_C33)
-            BlockDevice* block_device = BlockDevice::get_default_instance();
-            this -> user_data = new MBRBlockDevice(block_device, 2);
-            this -> user_data_fs = new FATFileSystem(this->partName);
-            int err = this -> user_data_fs -> mount(user_data);
+            this -> blockDevice = BlockDevice::get_default_instance();
+            this -> userData = new MBRBlockDevice(this->blockDevice, 2);
+            this -> userDataFileSystem = new FATFileSystem(this->partitionName);
+            int err = this -> userDataFileSystem -> mount(userData);
         #elif defined(ARDUINO_PORTENTA_H7_M7) 
-            this -> user_data = new mbed::MBRBlockDevice(QSPIFBlockDevice::get_default_instance(), this->partNo);
-            this -> user_data_fs =  new mbed::FATFileSystem(this->partName);
-            int err = this -> user_data_fs -> mount(this -> user_data);
+            this -> blockDevice = QSPIFBlockDevice::get_default_instance();
+            this -> userData = new mbed::MBRBlockDevice(this->blockDevice, this->partitionNumber);
+            this -> userDataFileSystem =  new mbed::FATFileSystem(this->partitionName);
+            int err = this -> userDataFileSystem -> mount(this -> userData);
             return err;
     #endif
 }
@@ -28,17 +29,29 @@ Directory InternalStorage::getRootFolder(){
 
 
 void InternalStorage::setQSPIPartition(int partition){
-    this -> partNo = partition;
+    this -> partitionNumber = partition;
 }
 
 void InternalStorage::setQSPIPartitionName(const char * name){
-    this -> partName = (char *)name;
+    this -> partitionName = (char *)name;
 }
 
 int InternalStorage::reformatQSPIPartition(){
-    return this -> user_data_fs -> reformat(this -> user_data);
+    this -> begin();
+    return this -> userDataFileSystem -> reformat(this -> userData);
+ 
 }
 
+#if defined(ARDUINO_PORTENTA_C33)
+BlockDevice * InternalStorage::getBlockDevice(){
+    return this -> blockDevice;
+}
+#endif
 
 
+#if defined(ARDUINO_PORTENTA_H7_M7) 
+              mbed::BlockDevice *  InternalStorage::getBlockDevice(){
+                return this -> blockDevice;
+              }
  
+#endif

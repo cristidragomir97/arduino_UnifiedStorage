@@ -1,4 +1,9 @@
-#include "USBStorage.h"
+#include "UnifiedStorage.h"
+#include <Arduino_USBHostMbed5.h>
+
+
+
+
 
 USBStorage::USBStorage(){
 
@@ -6,8 +11,9 @@ USBStorage::USBStorage(){
 
 int USBStorage::begin(){
     int err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
+
     while (0 != err) {
-        int err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
+        err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
         delay(100);
     }
     
@@ -20,4 +26,9 @@ int USBStorage::unmount(){
 
 Directory USBStorage::getRootFolder(){
     return Directory("/usb");
+}
+
+bool USBStorage::isConnected(){
+    USBHostMSD msd2;
+    return msd2.connect();
 }

@@ -1,8 +1,19 @@
 
-#include "Arduino.h"
+
+
 
 #ifndef Directory_H
 #define Directory_H
+
+#include "Types.h"
+#include "Doc.h"
+
+class Doc;
+
+
+namespace UniStdWrapper {
+  #include <unistd.h>
+}
 
 
 
@@ -12,27 +23,41 @@
  * @brief Class representing a directory.
  */
 class Directory {
+
   public:
+    /**
+     * @brief Blank Constructor.
+     */
     Directory();
     /**
      * @brief Constructor.
-     * @param dirname The name of the directory.
+     * @param const char * dirname The name of the directory.
      */
     Directory(const char * dirname);
+
+
+      /**
+     * @brief Constructor.
+     * @param string dirname The name of the directory.
+     */
+    Directory(String dirname);
 
     /**
      * @brief Creates a directory.
      * @param dirname The name of the directory to create.
      * @return True if the directory was created successfully, false otherwise.
      */
-    bool create(const char * dirname);
+
+    Doc createFile(const char * fileName, FileMode fmode);
+
+    Doc createFile(String fileName, FileMode fmode);
 
     /**
      * @brief Removes a directory.
      * @param dirname The name of the directory to remove.
      * @return True if the directory was removed successfully, false otherwise.
      */
-    bool remove(const char * dirname);
+    bool remove();
 
     /**
      * @brief Renames a directory.
@@ -40,6 +65,8 @@ class Directory {
      * @return True if the directory was renamed successfully, false otherwise.
      */
     bool rename(const char * newDirname);
+
+    bool rename(String newDirname);
 
     /**
      * @brief Checks if the directory exists.
@@ -53,6 +80,8 @@ class Directory {
      */
     const char * getPath();
 
+    String getPathString();
+
     // TODO: Also support Arduino String instead along with const char * 
 
     /**
@@ -62,40 +91,35 @@ class Directory {
      */
     Directory createSubfolder(const char * subfolderName);
 
+
+    Directory createSubfolder(String subfolderName);
+
     /**
      * @brief Removes a subfolder from the directory.
      * @param subfolderName The name of the subfolder to remove.
      * @return True if the subfolder was removed successfully, false otherwise.
      */
-    bool removeSubfolder(const char * subfolderName);
-
-    /**
-     * @brief Renames a subfolder in the directory.
-     * @param oldName The current name of the subfolder.
-     * @param newName The new name of the subfolder.
-     * @return True if the subfolder was renamed successfully, false otherwise.
-     */
-    bool renameSubfolder(const char * oldName,
-      const char * newName);
-
-    /**
-     * @brief Checks if the subfolder exists in the directory.
-     * @param subfolderName The name of the subfolder.
-     * @return True if the subfolder exists, false otherwise.
-     */
-    bool existsSubfolder(const char * subfolderName);
-
-    /**
-     * @brief Lists all files in the directory.
-     */
-    void listFiles();
+    std::vector<Doc> getFiles();
 
     /**
      * @brief Lists all subfolders in the directory.
      */
-    void listSubfolders();
+    std::vector<Directory>  getFolders();
+
+    bool copyTo(Directory destination);
+
+    bool copyTo(const char * destination);
+
+    bool copyTo(String destination);
+
+    bool moveTo(Directory destination);
+
+    bool moveTo(const char * destination);
+
+    bool moveTo(String destination);
 
   private: 
+  
     char * dirname;
     char * path;
     DIR * dir;

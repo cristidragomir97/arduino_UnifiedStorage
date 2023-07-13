@@ -1,11 +1,21 @@
-#include "File.h"
+#include "Doc.h"
 
 
-File::File() {
-    this->fp = nullptr;
+Doc::Doc() {
+   this->fp = nullptr;
 }
 
-bool File::open(const char* filename, FileMode fileMode) {
+Doc::Doc(const char* path){
+    this -> path = (char *)path;
+}
+
+bool Doc::changeMode(FileMode mode){
+    this->close();
+    return this -> open(this->path, mode);
+}
+
+
+bool Doc::open(const char* filename, FileMode fileMode) {
     const char* mode;
     
     this -> path = (char *)filename;
@@ -27,8 +37,8 @@ bool File::open(const char* filename, FileMode fileMode) {
 
     // Open the file
     this->fp = fopen(filename, mode);
-    Serial.println(filename);
-    Serial.println(mode);
+    this->fm = fileMode;
+
 
     if (this->fp == nullptr) {
         Serial.println(errno);
@@ -39,7 +49,11 @@ bool File::open(const char* filename, FileMode fileMode) {
     return true;
 }
 
-void File::close() {
+bool Doc::open(String filename, FileMode mode){
+    return this -> open(filename.c_str(), mode);
+}
+
+void Doc::close() {
     // Close the file
     if (this->fp != nullptr) {
         fclose(this->fp);
@@ -47,7 +61,7 @@ void File::close() {
     }
 }
 
-bool File::seek(size_t offset) {
+bool Doc::seek(size_t offset) {
     // Seek to a specific position in the file
     if (this->fp == nullptr) {
         // File pointer is not valid
@@ -58,7 +72,7 @@ bool File::seek(size_t offset) {
     return (result == 0);
 }
 
-int File::available() {
+int Doc::available() {
     // Check the available data in the file
     if (this->fp == nullptr) {
         // File pointer is not valid
@@ -73,18 +87,20 @@ int File::available() {
     return (fileSize - currentPosition);
 }
 
-int File::read() {
+int Doc::read() {
     // Read a single byte from the file
     if (this->fp == nullptr) {
         // File pointer is not valid
-        return -1;
+        return 0;
     }
 
     int value = fgetc(this->fp);
     return value;
 }
 
-size_t File::read(uint8_t* buffer, size_t size) {
+
+
+size_t Doc::read(uint8_t* buffer, size_t size) {
     // Read data from the file into the buffer
     if (this->fp == nullptr) {
         // File pointer is not valid
@@ -95,7 +111,29 @@ size_t File::read(uint8_t* buffer, size_t size) {
     return bytesRead;
 }
 
-size_t File::write(uint8_t value) {
+String Doc::readAsString() {
+  if (this->fp == nullptr) {
+    Serial.println("HERE WE ARE");
+    return String("");
+  }
+
+  this->seek(0);
+  size_t bytesAvailable = this->available();
+  uint8_t buffer[bytesAvailable + 1];
+  this->read(buffer, bytesAvailable);
+
+
+  String result = "";
+  for (size_t i = 0; i < bytesAvailable; i++) {
+    
+    result += static_cast<char>(buffer[i]);
+
+  }
+
+  return result;
+}
+
+size_t Doc::write(uint8_t value) {
     // Write a single byte to the file
     if (this->fp == nullptr) {
         // File pointer is not valid
@@ -106,7 +144,7 @@ size_t File::write(uint8_t value) {
     return (result != EOF) ? 1 : 0;
 }
 
-size_t File::write(const String& data) {
+size_t Doc::write(String data) {
     // Convert the String to a C-style null-terminated string
     const char* str = data.c_str();
 
@@ -114,12 +152,16 @@ size_t File::write(const String& data) {
     size_t dataSize = strlen(str);
 
     // Write data to the file
-    size_t bytesWritten = fwrite(str, sizeof(char), dataSize, fp);
+    size_t bytesWritten = fwrite(str, sizeof(char), dataSize, this->fp);
 
     return bytesWritten;
 }
 
-bool File::remove() {
+int Doc::peek(){
+
+}
+
+bool Doc::remove() {
     // Remove the file
     int result = ::remove((const char *)this->path);
     if (result == 0) {
@@ -130,7 +172,7 @@ bool File::remove() {
     }
 }
 
-bool File::rename(const char* newFilename) {
+bool Doc::rename(const char* newFilename) {
     // Rename the file
     int result = ::rename((const char *)this -> path, newFilename);
     if (result == 0) {
@@ -143,7 +185,11 @@ bool File::rename(const char* newFilename) {
     }
 }
 
-bool File::exists() {
+bool Doc::rename(String newFilename){
+    return this -> rename(newFilename.c_str());
+}
+
+bool Doc::exists() {
 
     // Check if the file exists
     FILE* file = fopen(this ->path, "r");
@@ -157,16 +203,31 @@ bool File::exists() {
     }
 }
 
-bool File::copyTo(const char* destinationPath) {
+
+bool Doc::copyTo(String destinationPath){
+    return this -> copyTo(destinationPath.c_str());
+}
+
+bool Doc::copyTo(Directory * destinationFolder){
+    const char * destinationPath = destinationFolder->getPath();
+    this -> copyTo(destinationPath);
+}
+
+bool Doc::copyTo(const char* destinationPath) {
+ 
+  const char* newPath =  replaceFirstPathComponent(this-> path, destinationPath);
+  
   // Open the source file for reading
   FILE* sourceFile = fopen(this->path, "r");
+
+
   if (sourceFile == nullptr) {
     Serial.println("Failed to open the source file for reading");
     return false;
   }
 
   // Open the destination file for writing
-  FILE* destinationFile = fopen(destinationPath, "w");
+  FILE* destinationFile = fopen(newPath, "w");
   if (destinationFile == nullptr) {
     Serial.println("Failed to open the destination file for writing");
     fclose(sourceFile);
@@ -186,22 +247,42 @@ bool File::copyTo(const char* destinationPath) {
   return true;
 }
 
-bool File::moveTo(const char* destinationPath) {
-  // Rename the file to the destination path
-  if (::rename(this->path, destinationPath) == 0) {
-    // Update the internal path
-    free(this->path);
-    this->path = strdup(destinationPath);
-    return true;
-  } else {
-    Serial.println("Failed to move the file");
-    return false;
-  }
+
+bool Doc::moveTo(String destinationPath){
+    return this -> moveTo(destinationPath.c_str());
 }
 
-Directory File::getParentFolder() {
+bool Doc::moveTo(Directory * destinationFolder){
+    const char * destinationPath = destinationFolder->getPath();
+    this -> moveTo(destinationPath);
+}
+
+
+bool Doc::moveTo(const char* destinationPath) {
+    const char* newPath =  replaceFirstPathComponent(this-> path, destinationPath);
+    fclose(this -> fp);
+    if (!copyTo(destinationPath)) {
+        return false;  // Return false if the copy operation fails
+    }
+
+    // Delete the source file
+    if (::remove(this->path)) {
+        Serial.println(errno);
+        return false;
+    }
+
+    Serial.println("reinitialising to new location: ");  Serial.println(newPath);
+    this -> open(newPath, this->fm);
+
+    return true;
+}
+
+Directory Doc::getParentFolder() {
   // Get the parent folder path
-  char* parentPath = strdup(this->path);
+  char* parentPath = (char*)malloc(strlen(this->path) + 1);
+    if (parentPath != nullptr) {
+    strcpy(parentPath, this->path);
+    }
   char* lastSlash = strrchr(parentPath, '/');
   if (lastSlash != nullptr) {
     *lastSlash = '\0'; // Null-terminate the parent folder path
@@ -212,3 +293,10 @@ Directory File::getParentFolder() {
   }
 }
 
+const char * Doc::getPath(){
+    return this ->path;
+}
+
+String Doc::getPathString(){
+    return String(this -> path);
+}

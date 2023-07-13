@@ -2,9 +2,9 @@
 
 if [[ $1 == "upload" ]]; then
     
-    arduino-cli compile -b arduino:renesas_portenta:portenta_c33 --library "/home/c.dragomir/ArduinoWorkspace/UnifiedStorageAPI/POSIXStorage"
+    arduino-cli compile -b arduino:renesas_portenta:portenta_c33 --clean --library "/home/c.dragomir/ArduinoWorkspace/arduino_UnifiedStorage/POSIXStorage" 
     arduino-cli upload -b arduino:renesas_portenta:portenta_c33
 else
     # Execute the two lines
-    arduino-cli compile -b arduino:renesas_portenta:portenta_c33 --library "/home/c.dragomir/ArduinoWorkspace/UnifiedStorageAPI/POSIXStorage"
+    arduino-cli compile -b arduino:renesas_portenta:portenta_c33 --clean --library "/home/c.dragomir/ArduinoWorkspace/arduino_UnifiedStorage/POSIXStorage"
 fi
