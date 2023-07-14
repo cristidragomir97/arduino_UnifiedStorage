@@ -22,13 +22,13 @@ bool Doc::open(const char* filename, FileMode fileMode) {
     // Set the mode based on the fileMode
     switch (fileMode) {
         case READ:
-            mode = "r";
+            mode = "r+";
             break;
         case WRITE:
-            mode = "w";
+            mode = "w+";
             break;
         case APPEND:
-            mode = "a";
+            mode = "a+";
             break;
         default:
             mode = "r"; // Default mode is "read"
@@ -41,7 +41,6 @@ bool Doc::open(const char* filename, FileMode fileMode) {
 
 
     if (this->fp == nullptr) {
-        Serial.println(errno);
         // Failed to open the file
         return false;
     }
@@ -113,7 +112,6 @@ size_t Doc::read(uint8_t* buffer, size_t size) {
 
 String Doc::readAsString() {
   if (this->fp == nullptr) {
-    Serial.println("HERE WE ARE");
     return String("");
   }
 
@@ -145,6 +143,13 @@ size_t Doc::write(uint8_t value) {
 }
 
 size_t Doc::write(String data) {
+
+    if (this->fp == nullptr) {
+        // File pointer is not valid
+
+        return 0;
+    }
+
     // Convert the String to a C-style null-terminated string
     const char* str = data.c_str();
 
@@ -155,6 +160,19 @@ size_t Doc::write(String data) {
     size_t bytesWritten = fwrite(str, sizeof(char), dataSize, this->fp);
 
     return bytesWritten;
+}
+
+
+size_t Doc::write(const uint8_t* buffer, size_t size){
+  if (this->fp == nullptr) {
+        // File pointer is not valid
+        return 0;
+    }
+
+     size_t bytesWritten = fwrite(buffer, sizeof(char), size, this->fp);
+
+    return bytesWritten;
+    
 }
 
 
@@ -205,8 +223,8 @@ bool Doc::copyTo(String destinationPath){
     return this -> copyTo(destinationPath.c_str());
 }
 
-bool Doc::copyTo(Directory * destinationFolder){
-    const char * destinationPath = destinationFolder->getPath();
+bool Doc::copyTo(Directory destinationFolder){
+    const char * destinationPath = destinationFolder.getPath();
     this -> copyTo(destinationPath);
 }
 
@@ -249,8 +267,8 @@ bool Doc::moveTo(String destinationPath){
     return this -> moveTo(destinationPath.c_str());
 }
 
-bool Doc::moveTo(Directory * destinationFolder){
-    const char * destinationPath = destinationFolder->getPath();
+bool Doc::moveTo(Directory destinationFolder){
+    const char * destinationPath = destinationFolder.getPath();
     this -> moveTo(destinationPath);
 }
 

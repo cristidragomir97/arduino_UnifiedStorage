@@ -52,6 +52,15 @@ class USBStorage : public UnifiedStorage {
         Directory getRootFolder() override;
 
         bool isConnected();
+        
+        bool isAvailable();
+
+        void checkConnection();
+    private:
+        bool connected = false;
+        bool available = false;
+        unsigned long previousMillis; 
+        int interval = 500;
 };
 
 

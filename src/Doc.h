@@ -136,7 +136,7 @@ public:
   * @param Directory destinationPath - The destination folder to copy the file to.
   * @return True upon success, false otherwise. 
   */
-  bool copyTo(Directory * destinationFolder);
+  bool copyTo(Directory destinationFolder);
 
   /**
   * @brief Moves the file to the specified destination path.
@@ -157,7 +157,7 @@ public:
   * @param Directory destinationFolder The destination directory to move the file to.
   * @return True upon success, false otherwise. 
   */
-  bool moveTo(Directory * destinationFolder);
+  bool moveTo(Directory  destinationFolder);
 
   /*
      * @brief Returns a reference to the parent folder of the current folder. 
