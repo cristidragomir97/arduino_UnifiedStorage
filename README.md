@@ -11,15 +11,21 @@ The UnifiedStorage library provides a unified interface to access different type
 ## Features
 
 ### Use QSPI Flash, SD cards, and USB mass storage devices
-This library allows you to easily switch between different storage mediums on supported boards. See the "Compatibility" section for the list of supported storage mediums.
+This library allows you to easily switch between different storage mediums on supported boards, check the "Compatibility" section for more details about what storage medium is supported on what board. 
 
-To initialize the storage medium, create a `UnifiedStorage` object and call its `begin()` method.
+To initialise the storage medium you need to create a `UnifiedStorage` object, and to mount it you need to call it's `begin()` method:
 
-```cpp
-UnifiedStorage storageMedium = USBStorage();
-storageMedium.begin();
+```c
+UnifiedStorage storageMedium = USBStorage(); // or
+// UnifiedStorage sd = SDStorage();
+// UnifiedStorage internal = InternalStorage();
+
+void setup(){
+	storageMedium.begin();
+}
 ```
-
+You can initialize a UnifiedStorage object of each type (QSPI, SD, USB), and copy files and folders from one medium to another.
+ 
 ### Open, Write, and Read Files
  
 #### Creating / Opening / Closing Files
