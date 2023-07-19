@@ -1,7 +1,22 @@
+/*
+This examples demonstrates the usage of the "UnifiedStorage" library,
+which allows the program to easily switch between different storage mediums.
+
+By uncommenting the appropriate lines, you can choose to use either an SD card, 
+a USB storage device, or internal storage as the storage medium. 
+
+The example code is set up to use an SD card by default.
+
+In the setup function, the code initializes the serial communication and checks if the storage medium is successfully mounted. 
+It then creates a root directory and three subdirectories within it.
+After creating the subdirectories, the code creates three files inside each subdirectory and writes data to them.
+
+Next, the code demonstrates how to read data from the files using the "seek" and "available" methods.
+It changes the mode of the files to read mode, moves the file pointers to the beginning, and reads the data from each file using a while loop.
+The read data is printed to the serial monitor.
+*/
+
 #include "UnifiedStorage.h"
-
-
-// This library allows you to use multiple storage mediums, changing from one to another is as simple as uncommenting these lines"
 
 SDStorage unifiedStorage = SDStorage(); // or
 //USBStorage unifiedStorage = USBStorage() // or

@@ -1,8 +1,14 @@
+/*
+This example demonstrates the usage of the "UnifiedStorage" library for logging and backing up data to USB storage in case a USB Mass Storage device is inserted. 
+*/
+
 #include "UnifiedStorage.h"
 #include <vector>
 
 #define INTERNAL_WRITE_LED LED_D1
 #define USB_MOUNTED_LED LED_D0
+
+
 
 Doc logFile;
 Doc backupFile;
@@ -41,13 +47,6 @@ void performUpdate() {
   lastUpdateFile.changeMode(FileMode::READ);  // Open the last update file in read mode
   int lastUpdateBytes = lastUpdateFile.readAsString().toInt();  // Read the last update size from the file
 
-  /*
-  Serial.print("Reading last update size: ");
-  Serial.println(lastUpdateBytes);
-  Serial.print("Available update size: ");
-  Serial.println(bytesWritten);
-    */
-
   if (lastUpdateBytes > bytesWritten) {
     logFile.changeMode(FileMode::WRITE);  // Open the log file in write mode
     logFile.write(String(0));  // Reset the log file by writing 0 as the last update size
@@ -70,10 +69,6 @@ void performUpdate() {
     }
   }
 
-  /*
-  Serial.print(bytesMoved);
-  Serial.println(" bytes moved to USB");
-  */
   backupFile.close();  // Close the backup file
 
   lastUpdateFile.changeMode(FileMode::WRITE);  // Open the last update file in write mode
@@ -81,17 +76,18 @@ void performUpdate() {
   backupFile.close();
   lastUpdateFile.close();
   usbStorage.unmount();  // Unmount the USB storage
+
   digitalWrite(USB_MOUNTED_LED, LOW);
 }
 
 // Function to backup data to USB storage
 void backupToUSB() {
   if (usbStorage.isAvailable()) {
-    //Serial.println("USB STORAGE IS AVAILABLE");
     if (!usbStorage.isConnected()) {
-      usbStorage.begin();  // Initialize the USB storage
+ 
       digitalWrite(USB_MOUNTED_LED, HIGH);
-      //Serial.println("USB STORAGE ENABLED");
+
+      usbStorage.begin();  // Initialize the USB storage
       Directory usbRoot = usbStorage.getRootFolder();  // Get the root folder of the USB storage
 
       backupFile = usbRoot.createFile("backup_file.txt", FileMode::APPEND);  // Create or open the backup file
@@ -101,8 +97,6 @@ void backupToUSB() {
     } else if (usbStorage.isConnected()) {
       performUpdate();
     }
-  } else {
-    //Serial.println("USB Mass storage Not available");
   }
 }
 

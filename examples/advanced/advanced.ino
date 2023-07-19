@@ -1,3 +1,18 @@
+/*
+This example demonstrates the usage of the "UnifiedStorage" library with USB storage and internal storage.
+The code includes the necessary library and defines instances of the "USBStorage" and "InternalStorage" classes.
+
+In the setup function, the code initializes the serial communication and mounts the USB storage and internal storage.
+It also reformats the internal storage to ensure a clean file system. 
+Then, it creates a root directory in the internal storage and creates a subdirectory and a file inside it
+
+The code writes some data to the file and demonstrates file operations. 
+It copies the file from internal storage to USB storage and moves the subdirectory from internal storage to USB storage.
+
+After the file operations, the code prints the contents of both the USB storage and the internal storage. 
+It recursively prints the directories (marked as "[D]") and files (marked as "[F]") using the "printDirectoryContents" function.
+*/
+
 #include "src/UnifiedStorage.h"
 
 

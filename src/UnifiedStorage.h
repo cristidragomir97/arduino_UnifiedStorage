@@ -26,7 +26,6 @@
 
 class UnifiedStorage {
     public:
-        // Override begin() method for SD card initialization
         virtual int begin();
 
         virtual int unmount();
