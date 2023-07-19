@@ -1,91 +1,179 @@
-#include "src/UnifiedStorage.h"
+/*
+This example demonstrates the usage of the "UnifiedStorage" library for logging and backing up data to USB storage in case a USB Mass Storage device is inserted. 
+
+The code defines two main functions: "logData" and "performUpdate". 
+The "logData" function logs sensor data by reading an analog sensor and writing the data to the log file.
+
+The "performUpdate" function performs the update process by:
+*  reading the last update size from a file
+*  moving the data from the log file to a backup file
+*  and updating the last update size.
+
+The code also includes a "runPeriodically" function, which is used to run a given method periodically based on a specified interval.
+
+Instructions
+* Make sure your Board is formatted properly. 
+* 
+*/
+
+#include <ArduinoRS485.h>
+#include "UnifiedStorage.h"
+#include <vector>
+
+#define INTERNAL_WRITE_LED LED_D1
+#define USB_MOUNTED_LED LED_D0
+
+constexpr auto baudrate { 115200 };
 
 
+Doc logFile;
+Doc backupFile;
+Doc lastUpdateFile;
 
-USBStorage usbStorage = USBStorage();
 InternalStorage internalStorage = InternalStorage();
+USBStorage usbStorage = USBStorage();
 
+unsigned long bytesWritten = 0;
+unsigned long lastLog = 0;
+unsigned long lastBackup = 0;
+unsigned long lastDisplay = 0;
 
-void printDirectoryContents(Directory dir, int indentation = 0) {
-  std::vector<Directory> directories = dir.getFolders();
-  std::vector<Doc> files = dir.getFiles();
+size_t printRS485(char* message)
+{
+    RS485.beginTransmission();
+    auto len = strlen(message);
+    RS485.write(message, len);
+    RS485.endTransmission();
+}
 
-  // Print directories
-  for (Directory subdir : directories) {
-    for (int i = 0; i < indentation; i++) {
-      Serial.print("  ");
-    }
-    Serial.print("[D] ");
-    Serial.println(subdir.getPath());
-    printDirectoryContents(subdir, indentation + 1);
-  }
+size_t printlnRS485(char* message)
+{
+    printRS485(message);
+    RS485.beginTransmission();
+    RS485.write('\r');
+    RS485.write('\n');
+    RS485.endTransmission();
+}
 
-  // Print files
-  for (Doc file : files) {
-    for (int i = 0; i < indentation; i++) {
-      Serial.print("  ");
-    }
-    Serial.print("[F] ");
-    Serial.println(file.getPath());
+void configureRS485(const int baudrate){
+    const auto bitduration { 1.f / baudrate };
+    const auto wordlen { 9.6f }; // OR 10.0f depending on the channel configuration
+    const auto preDelayBR { bitduration * wordlen * 3.5f * 1e6 };
+    const auto postDelayBR { bitduration * wordlen * 3.5f * 1e6 };
+
+    RS485.begin(baudrate);
+    RS485.setDelays(preDelayBR, postDelayBR);
+    RS485.noReceive();
+}
+
+// Function to run a given method periodically
+void runPeriodically(void (*method)(), unsigned long interval, unsigned long* variable) {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - *variable >= interval) {
+    *variable = currentMillis;
+    method();  // Call the provided method
   }
 }
 
+// Function to log sensor data
+void logData() {
+  digitalWrite(INTERNAL_WRITE_LED, HIGH);
+  int timeStamp = millis();
+  int sensorReading = analogRead(A0);
+  String line = String(timeStamp) + "," + String(sensorReading) + "\n";
+  bytesWritten += logFile.write(line);  // Write the log line to the file
+  digitalWrite(INTERNAL_WRITE_LED, LOW);
+}
+
+// Function to perform the update process
+void performUpdate() {
+  printlnRS485("Opening diff file");
+  lastUpdateFile.changeMode(FileMode::READ);  // Open the last update file in read mode
+  int lastUpdateBytes = lastUpdateFile.readAsString().toInt();  // Read the last update size from the file
+
+  if (lastUpdateBytes > bytesWritten) {
+    logFile.changeMode(FileMode::WRITE);  // Open the log file in write mode
+    logFile.write(String(0));  // Reset the log file by writing 0 as the last update size
+    lastUpdateBytes = 0;
+  }
+
+  logFile.changeMode(FileMode::READ);  // Open the log file in read mode
+  logFile.seek(lastUpdateBytes);  // Move the file pointer to the last update position
+  backupFile.changeMode(FileMode::APPEND);  // Open the backup file in append mode
+  unsigned long bytesMoved = 0;
+  unsigned long totalBytesToMove = bytesWritten - lastUpdateBytes;
+  unsigned int progressPercentage = 0;
+  printlnRS485("Ready to copy data");
+
+  while (logFile.available()) {
+    int data = logFile.read();  // Read a byte from the log file
+
+    if (data != -1) {
+      backupFile.write(data);  // Write the byte to the backup file
+      bytesMoved++;
+    }
+  }
+  printlnRS485("Succesfully copied data");
+
+  backupFile.close();  // Close the backup file
+
+  lastUpdateFile.changeMode(FileMode::WRITE);  // Open the last update file in write mode
+  lastUpdateFile.write(String(bytesWritten));  // Write the updated last update size to the file
+  backupFile.close();
+  lastUpdateFile.close();
+
+   printlnRS485("Succesfully updated diff file");
+  usbStorage.unmount();  // Unmount the USB storage
+
+  digitalWrite(USB_MOUNTED_LED, LOW);
+}
+
+// Function to backup data to USB storage
+void backupToUSB() {
+  if (usbStorage.isAvailable()) {
+    printlnRS485("USB Mass storage is available");
+    if (!usbStorage.isConnected()) {
+      digitalWrite(USB_MOUNTED_LED, HIGH);
+      printlnRS485("Mounting USB Mass Storage");
+      usbStorage.begin();  // Initialize the USB storage
+      Directory usbRoot = usbStorage.getRootFolder();  // Get the root folder of the USB storage
+
+      backupFile = usbRoot.createFile("backup_file.txt", FileMode::APPEND);  // Create or open the backup file
+      lastUpdateFile = usbRoot.createFile("diff.txt", FileMode::READ);  // Create or open the last update file
+
+      performUpdate();
+    } else if (usbStorage.isConnected()) {
+      printlnRS485("USB Mass storage is connected, performing update");
+      performUpdate();
+
+    }
+  }
+}
 
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial);
+  //Serial.begin(115200);
 
-  // Mount the USB storage
-  usbStorage.begin();
-  Serial.println("USB storage mounted.");
+  pinMode(INTERNAL_WRITE_LED, OUTPUT);
+  pinMode(USB_MOUNTED_LED, OUTPUT);
 
-  // Mount the internal storage
-  Serial.println("Reformatting internal storage to make sure we have a clean FS");
-  internalStorage.reformatQSPIPartition();
+  configureRS485(baudrate);
+  printlnRS485("RS485 goes brrr...");
 
-  internalStorage.begin();
-  Serial.println("Internal storage mounted.");
-
-  // Create a root directory in the internal storage
-  Directory root = internalStorage.getRootFolder();
-
-  // Create a subdirectory and a file inside the root directory
-  Directory subdir = root.createSubfolder("subdir");
-  Doc file = root.createFile("file.txt", FileMode::WRITE);
-
-  // Write some data to the file
-  file.write("Hello, world!");
-
-  // Copy the file from internal storage to USB storage
-  bool success = file.copyTo(usbStorage.getRootFolder());
-  if (success) {
-    Serial.println("File copied successfully from internal storage to USB storage.");
+  if (!internalStorage.begin() == 0) {
+    printlnRS485("Failed to initialize internal storage");
+    return;
   } else {
-    Serial.println("Failed to copy file from internal storage to USB storage.");
-    int err = errno;
-    Serial.println(err);
+    printlnRS485("Initialized storage");
   }
 
-  // Move the subdirectory from internal storage to USB storage
-  success = subdir.moveTo(usbStorage.getRootFolder());
-  if (success) {
-    Serial.println("Subdirectory moved successfully from internal storage to USB storage.");
-  } else {
-    Serial.println("Failed to move subdirectory from internal storage to USB storage.");
-    int err = errno;
-    Serial.println(err);
-  }
-
-  // Print the content of the USB storage
-  Serial.println("USB storage contents:");
-  printDirectoryContents(usbStorage.getRootFolder());
-
-  // Print the content of the internal storage
-  Serial.println("Internal storage contents:");
-  printDirectoryContents(internalStorage.getRootFolder());
+  logFile = internalStorage.getRootFolder().createFile("log.txt", FileMode::APPEND);  // Create or open the log file
+  printlnRS485("Created Log file ");
 }
 
 void loop() {
-  // Nothing to do here
+  usbStorage.checkConnection();
+  runPeriodically(logData, 100, &lastLog);
+  runPeriodically(backupToUSB, 10000, &lastBackup);
 }

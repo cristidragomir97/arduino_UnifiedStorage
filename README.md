@@ -14,6 +14,30 @@ It simplifies the handling of files and directories across multiple storage medi
 - Manipulate folders from one storage medium to another. 
 
 
+## Features
+### Use QSPI Flash, SD cards, and USB mass storage devices.
+There's 
+
+### Open, Write and read to files 
+
+
+#### Opening  
+```c
+Doc document; 
+
+
+```
+Documents can also be created from the root folder object like this:
+
+```c
+Directory root = <storage>.getRootFolder();
+Doc document = root.createFile("file.txt", FileMode:);
+```
+
+#### Reading 
+
+
+#### Writing
 
 ## Compatibility 
 This library is compatible with STM32 and Renesas based Arduino boards. However the storage mediums available depend on the hardware interfaces.
