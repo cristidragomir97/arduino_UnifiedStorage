@@ -1,4 +1,8 @@
-#include "UnifiedStorage.h"
+#include "SDStorage.h"
+
+
+
+#if defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_C33)
 
 SDStorage::SDStorage(){
 
@@ -15,3 +19,5 @@ int SDStorage::unmount(){
 Directory SDStorage::getRootFolder(){
     return Directory("/sdcard");
 }
+
+#endif

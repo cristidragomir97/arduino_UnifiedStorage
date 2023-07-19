@@ -9,3 +9,6 @@ else
     arduino-cli lib install --git-url https://github.com/arduino-libraries/Arduino_USBHostMbed5/
     arduino-cli compile -b arduino:mbed_portenta:envie_m7 --library "/home/c.dragomir/ArduinoWorkspace/arduino_UnifiedStorage/POSIXStorage" 
 fi
+
+
+  arduino:mbed_opta:opta

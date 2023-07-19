@@ -10,7 +10,7 @@ int InternalStorage::begin(){
             this -> userData = new MBRBlockDevice(this->blockDevice, 2);
             this -> userDataFileSystem = new FATFileSystem(this->partitionName);
             int err = this -> userDataFileSystem -> mount(userData);
-        #elif defined(ARDUINO_PORTENTA_H7_M7) 
+        #elif defined(ARDUINO_PORTENTA_H7_M7) ||  defined(ARDUINO_OPTA) 
             this -> blockDevice = QSPIFBlockDevice::get_default_instance();
             this -> userData = new mbed::MBRBlockDevice(this->blockDevice, this->partitionNumber);
             this -> userDataFileSystem =  new mbed::FATFileSystem(this->partitionName);
@@ -49,7 +49,7 @@ BlockDevice * InternalStorage::getBlockDevice(){
 #endif
 
 
-#if defined(ARDUINO_PORTENTA_H7_M7) 
+#if defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_OPTA) 
               mbed::BlockDevice *  InternalStorage::getBlockDevice(){
                 return this -> blockDevice;
               }

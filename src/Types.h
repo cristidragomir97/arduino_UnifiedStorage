@@ -99,7 +99,7 @@ static const char* getLastPathComponent(const char* path) {
     return path; // If no slash is found, the path itself is the last component
 }
 
-static const char * replaceFirstPathComponent(const char * path, const char * destinationPath){
+inline static const char * replaceFirstPathComponent(const char * path, const char * destinationPath){
   const char* fileName = getLastPathComponent((const char *) path);
   char* newPath = (char*)malloc(strlen(destinationPath) + strlen(fileName) + 2);
   strcpy(newPath, destinationPath);
@@ -107,6 +107,51 @@ static const char * replaceFirstPathComponent(const char * path, const char * de
   strcat(newPath, fileName);
 
   return newPath;
+}
+
+ inline static String POSIXErrorInfo(int errno){
+  switch (errno) {
+    case ENOENT:
+      return "No such file or directory";
+    case EEXIST:
+      return "File or directory already exists";
+    case EIO:
+      return "Input/output error";
+    case ENOTDIR:
+      return "Not a directory";
+    case EISDIR:
+      return "Is a directory";
+    case ENFILE:
+      return "Too many open files in system";
+    case EMFILE:
+      return "Too many open files";
+    case ENOSPC:
+      return "No space left on device";
+    case ENAMETOOLONG:
+      return "File name too long";
+    case EPERM:
+      return "Operation not permitted";
+    case ENODEV:
+      return "No such device";
+    case ENOTBLK:
+      return "Not a block device";
+    case EBUSY:
+      return "Device or resource busy";
+    case EAGAIN:
+      return "Resource temporarily unavailable";
+    case ENXIO:
+      return "No such device or address";
+    case ENOMEM:
+      return "Out of memory";
+    case EACCES:
+      return "Permission denied";
+    case EROFS:
+      return "Read-only file system";
+    case EINVAL:
+      return "Invalid argument";
+    default:
+      return "Undefined Error";
+    }
 }
 
 enum FileMode { READ, WRITE, APPEND };

@@ -237,14 +237,14 @@ bool Doc::copyTo(const char* destinationPath) {
 
 
   if (sourceFile == nullptr) {
-    Serial.println("Failed to open the source file for reading");
+    //Serial.println("Failed to open the source file for reading");
     return false;
   }
 
   // Open the destination file for writing
   FILE* destinationFile = fopen(newPath, "w");
   if (destinationFile == nullptr) {
-    Serial.println("Failed to open the destination file for writing");
+    //Serial.println("Failed to open the destination file for writing");
     fclose(sourceFile);
     return false;
   }
@@ -282,11 +282,9 @@ bool Doc::moveTo(const char* destinationPath) {
 
     // Delete the source file
     if (::remove(this->path)) {
-        Serial.println(errno);
         return false;
     }
 
-    Serial.println("reinitialising to new location: ");  Serial.println(newPath);
     this -> open(newPath, this->fm);
 
     return true;

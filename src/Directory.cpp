@@ -101,14 +101,12 @@ String Directory::getPathString(){
 }
 
 Directory Directory::createSubfolder(const char* subfolderName) {
-    Serial.println("lolololo");
   // Construct the full path of the subfolder
   char* subfolderPath = (char*)malloc(strlen(this->path) + strlen(subfolderName) + 2);
   strcpy(subfolderPath, this->path);
   strcat(subfolderPath, "/");
   strcat(subfolderPath, subfolderName);
 
-  Serial.println(subfolderPath);
 
   // Create the subfolder
   mkdir(subfolderPath, 0777);
@@ -139,7 +137,7 @@ std::vector<Doc>  Directory::getFiles() {
     closedir(directory);
     return ret;
   } else {
-    Serial.println("Failed to open the directory");
+    std::vector<Doc> ();
   }
 }
 
@@ -157,14 +155,13 @@ std::vector<Directory> Directory::getFolders() {
           strcat(subfolderPath, "/");
           strcat(subfolderPath, entry->d_name);
           ret.push_back((subfolderPath));
-          //Serial.println(entry->d_name);
         }
       }
     }
     closedir(directory);
     return ret;
   } else {
-    Serial.println("Failed to open the directory");
+    return std::vector<Directory> ();
   }
 }
 
@@ -263,11 +260,8 @@ bool Directory::moveTo(const char * destination){
   }
 
   if (this->remove()) {
-        Serial.println(errno);
         return false;
   }
-
-  Serial.println("reinitialising to new location: ");  Serial.println(newPath);
 
   this->path = (char *)newPath;
 }

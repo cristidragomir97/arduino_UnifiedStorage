@@ -1,7 +1,6 @@
 #include "src/UnifiedStorage.h"
 
 
-
 USBStorage usbStorage = USBStorage();
 InternalStorage internalStorage = InternalStorage();
 
@@ -63,8 +62,7 @@ void setup() {
     Serial.println("File copied successfully from internal storage to USB storage.");
   } else {
     Serial.println("Failed to copy file from internal storage to USB storage.");
-    int err = errno;
-    Serial.println(err);
+    Serial.println(getErrInfo(errno));
   }
 
   // Move the subdirectory from internal storage to USB storage
@@ -73,8 +71,7 @@ void setup() {
     Serial.println("Subdirectory moved successfully from internal storage to USB storage.");
   } else {
     Serial.println("Failed to move subdirectory from internal storage to USB storage.");
-    int err = errno;
-    Serial.println(err);
+    Serial.println(getErrInfo(errno));
   }
 
   // Print the content of the USB storage
