@@ -2,6 +2,12 @@
 
 The UnifiedStorage library provides a unified interface to access different types of storage, including internal storage, SD cards, and USB mass storage devices. It simplifies the handling of files and directories across multiple storage mediums on Portenta, Opta, and some Nicla boards.
 
+
+## Examples
+* **examples/basic** - this example is concerned with reading/writing and seeking
+* **examples/advanced** - this example is concerned with more advanced features like creating folders, traversing folder sturctures and moving/copying from one storage medium to another
+* **examples/opta_logger** - this is more of a real life usecase, where this library is used on an Arduino Opta to log sensor data to a file on the internal storage and check if a USB Mass Storage deviece is inserted. If it is detected it will backup the information on the internal storage, only copying the bytes that are new since the last update.
+  
 ## Features
 
 ### Use QSPI Flash, SD cards, and USB mass storage devices
