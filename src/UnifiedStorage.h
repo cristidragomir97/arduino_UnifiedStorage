@@ -26,11 +26,11 @@
 
 class UnifiedStorage {
     public:
-        virtual int begin();
+        virtual int begin() = 0;
 
-        virtual int unmount();
+        virtual int unmount() = 0;
 
-        virtual Directory getRootFolder();
+        virtual Directory getRootFolder() = 0;
 };
 
 

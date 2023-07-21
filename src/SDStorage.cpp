@@ -9,7 +9,7 @@ SDStorage::SDStorage(){
 }
 
 int SDStorage::begin(){
-  return mount(DEV_SDCARD, FS_FAT, MNT_DEFAULT);
+  return mount(DEV_SDCARD, FS_FAT, MNT_DEFAULT) == 0;
 }
 
 int SDStorage::unmount(){

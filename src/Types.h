@@ -109,7 +109,7 @@ inline static const char * replaceFirstPathComponent(const char * path, const ch
   return newPath;
 }
 
- inline static String POSIXErrorInfo(int errno){
+ inline static String getErrno(){
   switch (errno) {
     case ENOENT:
       return "No such file or directory";

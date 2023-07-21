@@ -1,35 +1,38 @@
 #include "USBStorage.h"
-#include <Arduino_USBHostMbed5.h>
 
+#if defined(ARDUINO_PORTENTA_H7_M7)
+    #include <Arduino_USBHostMbed5.h>
+#endif
 
-
-
+#define MAX_TRIES 5
 
 USBStorage::USBStorage(){
 }
 
 int USBStorage::begin(){
+    int attempts = 0;
     int err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
 
-    while (0 != err) {
+    while (0 != err && attempts < MAX_TRIES) {
+        attempts +=1;
         err = mount(DEV_USB, FS_FAT, MNT_DEFAULT);
-        Serial.println(err);
-        Serial.println(errno);
+        Serial.println("USB not connected yet, retrying..");
         delay(100);
     }
 
-    
     if(err == 0){
         this -> connected = true;
     }
 
-    return err;
+    return err == 0;
 }
 
 int USBStorage::unmount(){
-  this -> connected = false;
-  return umount(DEV_USB);
-
+  auto unmountResult = umount(DEV_USB);
+  if(unmountResult == 0){
+      this -> connected = false;
+  }
+  return unmountResult;
 }
 
 Directory USBStorage::getRootFolder(){
@@ -43,9 +46,10 @@ bool USBStorage::isAvailable(){
 
 bool USBStorage::isConnected(){
     return this -> connected;
-}
+}errno
 
 void USBStorage::checkConnection(){
+    #if defined(ARDUINO_PORTENTA_H7_M7)
     USBHost * host;
     USBDeviceConnected * dev;
     unsigned long currentMillis = millis();
@@ -68,4 +72,5 @@ void USBStorage::checkConnection(){
                 this->available = false;
             }
     }
+    #endif
 }
